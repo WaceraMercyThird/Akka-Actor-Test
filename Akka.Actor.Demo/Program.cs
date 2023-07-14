@@ -16,13 +16,13 @@ namespace Akka.Actor.Demo
         {
             var serviceCollection = new ServiceCollection();
 
-            serviceCollection.AddSingleton<IEmailNotification, EmailNotification>();
+            serviceCollection.AddScoped<IEmailNotification, EmailNotification>();
 
-            serviceCollection.AddSingleton<NotificationActor>();
+            serviceCollection.AddScoped<NotificationActor>();
 
-            serviceCollection.AddSingleton<TestNotificationActor>();
+            serviceCollection.AddScoped<TestNotificationActor>();
 
-            serviceCollection.AddSingleton<SecondNotificationActor>();
+            serviceCollection.AddScoped<SecondNotificationActor>();
 
             var ServiceProvider = serviceCollection.BuildServiceProvider();
 
@@ -33,10 +33,19 @@ namespace Akka.Actor.Demo
 
             var actor = actorSystem.ActorOf(actorSystem.DI().Props<NotificationActor>());
 
-            //invoke actor
-            actor.Tell("Hello There");
 
-            Console.ReadLine();
+            Console.WriteLine("Enter message");
+
+            while (true)
+            {
+                var message = Console.ReadLine();
+                if (message == "q") break;
+                actor.Tell(message);
+            }
+            //invoke actor
+            //actor.Tell("Hello There");
+
+            //Console.ReadLine();
 
             actorSystem.Stop(actor);
 

@@ -31,6 +31,26 @@ namespace Akka.Actor.Demo
             _secondChildActor.Tell(message);
         }
 
+        protected override SupervisorStrategy SupervisorStrategy()
+        {
+            return new OneForOneStrategy(
+                maxNrOfRetries : 10,
+                withinTimeRange: TimeSpan.FromSeconds(1),
+                localOnlyDecider: ex =>
+                {
+                    switch (ex)
+                    {
+                        case ArgumentException ae:
+                            return Directive.Resume;
+                        case NullReferenceException ne:
+                            return Directive.Restart;
+                        default:
+                            return Directive.Stop;
+                    }
+                }
+                );
+        }
+
         protected override void PreStart() => Console.WriteLine("Actor started");
 
         protected override void PostStop() => Console.WriteLine("Actor stoped");
